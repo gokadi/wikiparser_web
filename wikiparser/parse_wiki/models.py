@@ -85,6 +85,10 @@ class Article(models.Model):
             p_list.append(section.output())
         return json.dumps(p_list, indent=2, ensure_ascii=False)
 
+    def __repr__(self):
+        return '<Article \'{}\''.format(self.article_name)
+
+
 class Section(models.Model):
 
     title = models.CharField(max_length=64, blank=False)
@@ -104,3 +108,9 @@ class Section(models.Model):
 
     def output(self):
         return [self.title, self.summarized]
+
+    def __repr__(self):
+        return '<Section \'{}\' Article \'{}\''.format(self.title, self.article.article_name)
+
+    def __str__(self):
+        return str([self.title, self.summarized])
