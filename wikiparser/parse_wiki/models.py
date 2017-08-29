@@ -2,7 +2,7 @@ from django.db import models
 import wikipedia
 import json
 from bs4 import BeautifulSoup
-from backend import FrequencySummarizer
+from parse_wiki.backend import FrequencySummarizer
 import sys
 
 
@@ -95,11 +95,11 @@ class Section(models.Model):
     article = models.ForeignKey(Article, related_name='sections')
 
     def __init__(self, *args, **kwargs):
-        self.title = kwargs.pop('title')
-        self.text = kwargs.pop('text')
-        self.indicator = kwargs.pop('indicator')
-        self.summarized = kwargs.pop('summarized')
-        self.keywords = kwargs.pop('keywords')
+        self.title = kwargs.pop('title', None)
+        self.text = kwargs.pop('text', None)
+        self.indicator = kwargs.pop('indicator', None)
+        self.summarized = kwargs.pop('summarized', None)
+        self.keywords = kwargs.pop('keywords', None)
         super().__init__(*args, **kwargs)
 
     def output(self):
