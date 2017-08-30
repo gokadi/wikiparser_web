@@ -53,6 +53,7 @@ class FrequencySummarizer:
         Used to count number of sentences to be output
         :return: list of n sentences which represent summary of the text
         """
+        content_level = int(content_level)
         if not isinstance(text, str):
             raise Exception('Text for summarizing must be a string')
         if content_level <= 0:

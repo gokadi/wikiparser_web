@@ -2,8 +2,10 @@ from django.db import models
 import wikipedia
 import json
 from bs4 import BeautifulSoup
-from parse_wiki.backend import FrequencySummarizer
-import sys
+
+
+
+
 
 
 class Article(models.Model):
@@ -25,7 +27,7 @@ class Article(models.Model):
     def content(self):
         import requests
         response = requests.get(self.url)
-        return response.content
+        return response.content.decode()
 
     def soup_sections(self):
         soup = BeautifulSoup(self.content, 'lxml')
@@ -41,52 +43,61 @@ class Article(models.Model):
     def wiki_sections(self):
         return [BeautifulSoup(s, 'lxml').get_text() for s in wikipedia.page(self.article_name).sections]
 
-    def __section_division(self):
-        fs = FrequencySummarizer()
-        if self.content.split('=')[0]:
-            intro_text = self.content.split('=')[0]
-            intro_summarized = fs.summarize(intro_text, self.content_level)
-            intro_keywords = fs.keywords(intro_text)
-            self.sections.create(title='Introduction',
-                                 text=intro_text,
-                                 indicator='Introduction',
-                                 summarized=intro_summarized,
-                                 keywords=intro_keywords,
-                                 article=self)
-
-        for sect_name in self.wiki_sections:
-            text = wikipedia.page(self.article_name).section(sect_name)
-            h2, h3, h4, h5 = self.soup_sections()
-            if sect_name in h2:  # Indicator
-                indicator = 'Section'
-            elif sect_name in h3:
-                indicator = 'Subection'
-            elif sect_name in h4:
-                indicator = 'SubSubsection'
-            elif sect_name in h5:
-                indicator = 'SubSubSubsection'
-            else:
-                indicator = 'ERROR. No section %s' % sect_name
-
-            fs = FrequencySummarizer()
-            summarized = fs.summarize(text, self.content_level)
-            keywords = fs.keywords(text)
-            self.sections.create(title=sect_name,
-                                 text=text,
-                                 indicator=indicator,
-                                 summarized=summarized,
-                                 keywords=keywords,
-                                 article=self)
+    # def _section_division(self):
+    #     content = wikipedia.page(self.article_name).content
+    #     self.save()
+    #     fs = FrequencySummarizer()
+    #     if content.split('=')[0]:
+    #         intro_text = content.split('=')[0]
+    #         print(intro_text)
+    #         intro_summarized = fs.summarize(intro_text, self.content_level)
+    #         print(intro_summarized)
+    #         intro_keywords = fs.keywords(intro_text)
+    #         self.sections.create(title='Introduction',
+    #                              text=intro_text,
+    #                              indicator='Introduction',
+    #                              summarized=intro_summarized,
+    #                              keywords=intro_keywords,
+    #                              )
+    #         print(self.sections.all()[0].title)
+    #     self.save()
+    #
+    #     for sect_name in self.wiki_sections:
+    #         text = wikipedia.page(self.article_name).section(sect_name)
+    #         h2, h3, h4, h5 = self.soup_sections()
+    #         if sect_name in h2:  # Indicator
+    #             indicator = 'Section'
+    #         elif sect_name in h3:
+    #             indicator = 'Subsection'
+    #         elif sect_name in h4:
+    #             indicator = 'SubSubsection'
+    #         elif sect_name in h5:
+    #             indicator = 'SubSubSubsection'
+    #         else:
+    #             indicator = 'ERROR. No section %s' % sect_name
+    #
+    #         fs = FrequencySummarizer()
+    #         summarized = fs.summarize(text, self.content_level)
+    #         keywords = fs.keywords(text)
+    #         self.sections.create(title=sect_name,
+    #                              text=text,
+    #                              indicator=indicator,
+    #                              summarized=summarized,
+    #                              keywords=keywords,
+    #                              )
+    #         self.save()
 
     def get_output(self):
-        self.__section_division()
         p_list = list()
-        for section in self.sections:
+        for section in self.sections.all():
             p_list.append(section.output())
         return json.dumps(p_list, indent=2, ensure_ascii=False)
 
     def __repr__(self):
-        return '<Article \'{}\''.format(self.article_name)
+        return '<Article \'{}\'>'.format(self.article_name)
+
+    def __str__(self):
+        return 'Article \'{}\''.format(self.article_name)
 
 
 class Section(models.Model):
@@ -98,19 +109,22 @@ class Section(models.Model):
     keywords = models.TextField()
     article = models.ForeignKey(Article, related_name='sections')
 
-    def __init__(self, *args, **kwargs):
-        self.title = kwargs.pop('title', None)
-        self.text = kwargs.pop('text', None)
-        self.indicator = kwargs.pop('indicator', None)
-        self.summarized = kwargs.pop('summarized', None)
-        self.keywords = kwargs.pop('keywords', None)
-        super().__init__(*args, **kwargs)
+    # def __init__(self, title=None, text=None, indicator=None, summarized=None, keywords=None, article=None, *args, **kwargs):
+    #     super(Section, self).__init__(*args, **kwargs)
+    #     self.title = title
+    #     self.text = text
+    #     self.indicator = indicator
+    #     self.summarized = summarized
+    #     self.keywords = keywords
+    #     self.article = article
 
     def output(self):
         return [self.title, self.summarized]
 
     def __repr__(self):
-        return '<Section \'{}\' Article \'{}\''.format(self.title, self.article.article_name)
+        return '<Section \'{}\' Article \'{}\'>'.format(self.title, self.article.article_name)
 
     def __str__(self):
-        return str([self.title, self.summarized])
+        return str(self.title)
+
+

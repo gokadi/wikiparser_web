@@ -1,10 +1,9 @@
 from rest_framework import serializers
-from models import Article
+from parse_wiki.models import Article
 
 
 class ArticleSerializer(serializers.ModelSerializer):
 
-    sections = serializers.StringRelatedField(many=True)
     output = serializers.ReadOnlyField(source='get_output')
 
     class Meta:
