@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.db import models
 import wikipedia
 import json
@@ -10,11 +12,11 @@ from bs4 import BeautifulSoup
 
 class Article(models.Model):
     CONTENT_CHOICES = (
-        ('0', 'No text'),
-        ('25', 'Quarter of text'),
-        ('50', 'Half of text'),
-        ('75', 'Three quarters of text'),
-        ('100', 'Full text'),
+        ('0%', 'No text'),
+        ('25%', 'Quarter of text'),
+        ('50%', 'Half of text'),
+        ('75%', 'Three quarters of text'),
+        ('100%', 'Full text'),
     )
     article_name = models.CharField(max_length=64, blank=False)
     content_level = models.CharField(max_length=3, choices=CONTENT_CHOICES)
@@ -88,10 +90,13 @@ class Article(models.Model):
     #         self.save()
 
     def get_output(self):
-        p_list = list()
+        # p_list = list()
+        p_dict = OrderedDict()
         for section in self.sections.all():
-            p_list.append(section.output())
-        return json.dumps(p_list, indent=2, ensure_ascii=False)
+            tmp = section.output()
+            p_dict[tmp[0]] = tmp[1]
+            # p_list.append(section.output())
+        return json.dumps(p_dict, indent=2, ensure_ascii=False)
 
     def __repr__(self):
         return '<Article \'{}\'>'.format(self.article_name)
@@ -109,15 +114,6 @@ class Section(models.Model):
     keywords = models.TextField()
     article = models.ForeignKey(Article, related_name='sections')
 
-    # def __init__(self, title=None, text=None, indicator=None, summarized=None, keywords=None, article=None, *args, **kwargs):
-    #     super(Section, self).__init__(*args, **kwargs)
-    #     self.title = title
-    #     self.text = text
-    #     self.indicator = indicator
-    #     self.summarized = summarized
-    #     self.keywords = keywords
-    #     self.article = article
-
     def output(self):
         return [self.title, self.summarized]
 
@@ -125,6 +121,6 @@ class Section(models.Model):
         return '<Section \'{}\' Article \'{}\'>'.format(self.title, self.article.article_name)
 
     def __str__(self):
-        return str(self.title)
+        return 'Article: ' + self.article.article_name + '. Section: ' + self.title
 
 

@@ -7,7 +7,6 @@ from parse_wiki.backend import FrequencySummarizer
 
 @receiver(post_save, sender=Article)
 def get_sections(sender, instance, created, **kwargs):
-    print('IN')
     content = wikipedia.page(instance.article_name).content
     fs = FrequencySummarizer()
     if content.split('=')[0]:

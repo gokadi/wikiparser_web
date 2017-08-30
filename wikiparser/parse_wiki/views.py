@@ -1,7 +1,8 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 
 from rest_framework import viewsets
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
 from parse_wiki.models import Article
@@ -13,6 +14,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
 
-    @detail_route(methods=['post'])
-    def show_sections(self):
-        return Response(self.serializer_class.output)
+    @list_route(methods=['get'])
+    def show_sections(self, request, **kwargs):
+        article, created = self.queryset.get_or_create(article_name=request.GET['title'],
+                                                       content_level=request.GET['content_level']
+                                                       )  # Title is the name of the article
+        if created:
+            article.save()
+        return JsonResponse(article.get_output(), safe=False)  # Returns JSON with summarized article
