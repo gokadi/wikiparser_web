@@ -1,13 +1,8 @@
 from collections import OrderedDict
-
 from django.db import models
 import wikipedia
 import json
 from bs4 import BeautifulSoup
-
-
-
-
 
 
 class Article(models.Model):

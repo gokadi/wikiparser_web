@@ -21,4 +21,4 @@ class ArticleViewSet(viewsets.ModelViewSet):
                                                        )  # Title is the name of the article
         if created:
             article.save()
-        return JsonResponse(article.get_output(), safe=False)  # Returns JSON with summarized article
+        return Response(article.get_output())  # Returns JSON with summarized article
