@@ -3,15 +3,11 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from parse_wiki.models import Article, Section
 from parse_wiki.backend import FrequencySummarizer
-from wikipedia.exceptions import DisambiguationError
 
 
 @receiver(post_save, sender=Article)
 def get_sections(sender, instance, created, **kwargs):
-    try:
-        content = wikipedia.page(instance.article_name).content
-    except DisambiguationError as e:
-        raise Exception(str(e))
+    content = wikipedia.page(instance.article_name).content
     fs = FrequencySummarizer()
     if content.split('=')[0]:
         intro_text = content.split('=')[0]
