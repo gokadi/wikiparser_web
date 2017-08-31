@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
-
+from wikipedia.exceptions import DisambiguationError
 from parse_wiki.models import Article
 from parse_wiki.rest_serializers import ArticleSerializer
 
@@ -20,7 +20,12 @@ class ArticleViewSet(viewsets.ModelViewSet):
                                                        content_level=request.GET.get('content_level', '50%')
                                                        )  # Title is the name of the article
         if created:
-            article.save()
+            try:
+                article.save()
+            except DisambiguationError as e:
+                return render(request, 'summ.html', {'summ': str(e),
+                                                     'title': 'ERROR! BAD TITLE',
+                                                     'content_level': 'ERROR! BAD TITLE'})
         return render(request, 'summ.html', {'summ': article.get_output(),
                                              'title': article.article_name,
                                              'content_level': article.content_level})
