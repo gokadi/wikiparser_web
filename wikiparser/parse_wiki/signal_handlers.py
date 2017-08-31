@@ -20,10 +20,12 @@ def get_sections(sender, instance, created, **kwargs):
                                keywords=intro_keywords,
                                article=instance
                                )
+    h2, h3, h4, h5 = instance.soup_sections()
+    page = wikipedia.page(instance.article_name)
+    fs = FrequencySummarizer()
 
     for sect_name in instance.wiki_sections:
-        text = wikipedia.page(instance.article_name).section(sect_name)
-        h2, h3, h4, h5 = instance.soup_sections()
+        text = page.section(sect_name)
         if sect_name in h2:  # Indicator
             indicator = 'Section'
         elif sect_name in h3:
@@ -35,9 +37,9 @@ def get_sections(sender, instance, created, **kwargs):
         else:
             indicator = 'ERROR. No section %s' % sect_name
 
-        fs = FrequencySummarizer()
         summarized = fs.summarize(text, instance.content_level)
         keywords = fs.keywords(text)
+
         Section.objects.create(title=sect_name,
                                text=text,
                                indicator=indicator,
