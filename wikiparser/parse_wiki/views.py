@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
-from wikipedia.wikipedia import DisambiguationError
+from wikipedia.exceptions import DisambiguationError
 from parse_wiki.models import Article
 from parse_wiki.rest_serializers import ArticleSerializer
 
