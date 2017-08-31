@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import render
 
@@ -17,11 +18,17 @@ class ArticleViewSet(viewsets.ModelViewSet):
     @list_route(methods=['get'])
     def show_sections(self, request, **kwargs):
         try:
-            article, created = self.queryset.get_or_create(article_name=request.GET.get('title', 'Michael Jackson'),
-                                                       content_level=request.GET.get('content_level', '50%')
-                                                       )  # Title is the name of the article
-            if created:
-                article.save()
+            try:
+                article = self.queryset.get(article_name=request.GET.get('title', 'Michael Jackson'),
+                                            content_level=request.GET.get('content_level', '50%'))
+            except ObjectDoesNotExist:
+                article = self.queryset.create(article_name=request.GET.get('title', 'Michael Jackson'),
+                                               content_level=request.GET.get('content_level', '50%'))
+            # article, created = self.queryset.get_or_create(article_name=request.GET.get('title', 'Michael Jackson'),
+            #                                            content_level=request.GET.get('content_level', '50%')
+            #                                            )  # Title is the name of the article
+            # if created:
+            #     article.save()
         except DisambiguationError as e:
             return render(request, 'summ.html', {'summ': str(e),
                                                  'title': 'ERROR! BAD TITLE',
