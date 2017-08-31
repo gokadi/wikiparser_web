@@ -20,6 +20,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
             article, created = self.queryset.get_or_create(article_name=request.GET.get('title', 'Michael Jackson'),
                                                        content_level=request.GET.get('content_level', '50%')
                                                        )  # Title is the name of the article
+            if created:
+                article.save()
         except DisambiguationError as e:
             return render(request, 'summ.html', {'summ': str(e),
                                                  'title': 'ERROR! BAD TITLE',
