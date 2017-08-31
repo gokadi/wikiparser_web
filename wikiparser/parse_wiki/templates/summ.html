@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<label>Article: "{{ title }}"</label>
+<br><label>Content-level: "{{ content_level }}"</label>
+<br><textarea readonly disabled rows="40" cols="80">
+{{ summ }}
+ </textarea>
+<br><a href="{% url 'index' %}"><button>Choose another article</button></a>
+</body>
+</html>

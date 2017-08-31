@@ -16,9 +16,12 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'])
     def show_sections(self, request, **kwargs):
-        article, created = self.queryset.get_or_create(article_name=request.GET['title'],
-                                                       content_level=request.GET['content_level']
+        article, created = self.queryset.get_or_create(article_name=request.GET.get('title', 'Michael Jackson'),
+                                                       content_level=request.GET.get('content_level', '50%')
                                                        )  # Title is the name of the article
         if created:
             article.save()
-        return Response(article.get_output())  # Returns JSON with summarized article
+        return render(request, 'summ.html', {'summ': article.get_output(),
+                                             'title': article.article_name,
+                                             'content_level': article.content_level})
+        # return Response({'summ': article.get_output()})  # Returns JSON with summarized article

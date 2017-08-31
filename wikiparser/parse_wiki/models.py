@@ -40,50 +40,6 @@ class Article(models.Model):
     def wiki_sections(self):
         return [BeautifulSoup(s, 'lxml').get_text() for s in wikipedia.page(self.article_name).sections]
 
-    # def _section_division(self):
-    #     content = wikipedia.page(self.article_name).content
-    #     self.save()
-    #     fs = FrequencySummarizer()
-    #     if content.split('=')[0]:
-    #         intro_text = content.split('=')[0]
-    #         print(intro_text)
-    #         intro_summarized = fs.summarize(intro_text, self.content_level)
-    #         print(intro_summarized)
-    #         intro_keywords = fs.keywords(intro_text)
-    #         self.sections.create(title='Introduction',
-    #                              text=intro_text,
-    #                              indicator='Introduction',
-    #                              summarized=intro_summarized,
-    #                              keywords=intro_keywords,
-    #                              )
-    #         print(self.sections.all()[0].title)
-    #     self.save()
-    #
-    #     for sect_name in self.wiki_sections:
-    #         text = wikipedia.page(self.article_name).section(sect_name)
-    #         h2, h3, h4, h5 = self.soup_sections()
-    #         if sect_name in h2:  # Indicator
-    #             indicator = 'Section'
-    #         elif sect_name in h3:
-    #             indicator = 'Subsection'
-    #         elif sect_name in h4:
-    #             indicator = 'SubSubsection'
-    #         elif sect_name in h5:
-    #             indicator = 'SubSubSubsection'
-    #         else:
-    #             indicator = 'ERROR. No section %s' % sect_name
-    #
-    #         fs = FrequencySummarizer()
-    #         summarized = fs.summarize(text, self.content_level)
-    #         keywords = fs.keywords(text)
-    #         self.sections.create(title=sect_name,
-    #                              text=text,
-    #                              indicator=indicator,
-    #                              summarized=summarized,
-    #                              keywords=keywords,
-    #                              )
-    #         self.save()
-
     def get_output(self):
         # p_list = list()
         p_dict = OrderedDict()
@@ -97,7 +53,7 @@ class Article(models.Model):
         return '<Article \'{}\'>'.format(self.article_name)
 
     def __str__(self):
-        return 'Article \'{}\''.format(self.article_name)
+        return 'Article \'{}\' Content_level {}'.format(self.article_name, self.content_level)
 
 
 class Section(models.Model):
