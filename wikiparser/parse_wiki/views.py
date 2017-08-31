@@ -5,7 +5,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
-from wikipedia.exceptions import DisambiguationError
+from wikipedia.exceptions import DisambiguationError, PageError
 from parse_wiki.models import Article
 from parse_wiki.rest_serializers import ArticleSerializer
 
@@ -30,6 +30,10 @@ class ArticleViewSet(viewsets.ModelViewSet):
             # if created:
             #     article.save()
         except DisambiguationError as e:
+            return render(request, 'summ.html', {'summ': str(e),
+                                                 'title': 'ERROR! BAD TITLE',
+                                                 'content_level': 'ERROR! BAD TITLE'})
+        except PageError as e:
             return render(request, 'summ.html', {'summ': str(e),
                                                  'title': 'ERROR! BAD TITLE',
                                                  'content_level': 'ERROR! BAD TITLE'})
