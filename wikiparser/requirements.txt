@@ -2,7 +2,7 @@ beautifulsoup4==4.6.0
 bs4==0.0.1
 certifi==2017.7.27.1
 chardet==3.0.4
-Django==1.11.4
+Django==1.11.28
 django-annoying==0.10.3
 django-extensions==1.9.0
 djangorestframework==3.6.4
